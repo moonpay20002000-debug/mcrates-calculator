@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>McDonald's Rate Calculator</title>
+
+<style>
+/* (ALL YOUR CSS REMAINS THE SAME — no changes) */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Inter", Arial, sans-serif;
+    background: #FFF5E1;
+    color: #1A1A1A;
+    opacity: 0;
+    animation: fadeInPage 0.6s ease-out forwards;
+}
+@keyframes fadeInPage {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+h1 {
+    margin: 0;
+    padding: 20px 0 5px;
+    text-align: center;
+    font-size: 32px;
+    font-weight: 700;
+    color: #C8102E;
+    opacity: 0;
+    transform: translateY(-10px);
+    animation: fadeSlideDown 0.7s ease-out forwards;
+}
+h2 {
+    text-align: center;
+    margin: 0 0 20px;
+    font-size: 18px;
+    color: #555;
+    font-weight: 600;
+    opacity: 0;
+    transform: translateY(-10px);
+    animation: fadeSlideDown 0.7s ease-out forwards;
+    animation-delay: 0.15s;
+}
+@keyframes fadeSlideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.container {
+    width: 90%;
+    max-width: 900px;
+    margin: 0 auto 40px;
+}
+
+.dashboard {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+.dash-card {
+    flex: 1;
+    background: #fff;
+    padding: 18px;
+    border-radius: 10px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    text-align: center;
+    opacity: 0;
+    transform: translateY(10px);
+    animation: fadeUp 0.6s ease-out forwards;
+}
+.dash-card:nth-child(2) { animation-delay: 0.1s; }
+.dash-card:nth-child(3) { animation-delay: 0.2s; }
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.input-card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: fadeIn 0.7s ease-out forwards;
+    animation-delay: 0.3s;
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.input-group { margin-bottom: 15px; }
+.input-group label { font-weight: 600; display: block; margin-bottom: 5px; }
+
+input, select {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ECECEC;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: 0.2s;
+}
+input:focus, select:focus {
+    border-color: #FFC72C;
+    outline: none;
+    box-shadow: 0 0 6px rgba(255, 199, 44, 0.6);
+}
+
+.warning {
+    color: #C8102E;
+    font-size: 13px;
+    margin-top: 3px;
+    display: none;
+    font-weight: 600;
+}
+
+.btn {
+    padding: 12px 18px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    transition: 0.25s ease;
+}
+.btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.btn-primary { background: #C8102E; color: #fff; }
+.btn-amber { background: #FFC72C; color: #1A1A1A; }
+.btn-muted { background: #9A9A9A; color: #fff; }
+.btn-danger { background: #E63946; color: #fff; }
+
+.delete-container { text-align: right; margin-top: 10px; }
+
+.table-container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    max-height: 350px;
+    overflow-y: auto;
+    opacity: 0;
+    animation: fadeIn 0.7s ease-out forwards;
+    animation-delay: 0.45s;
+}
+
+table { width: 100%; border-collapse: collapse; }
+th { background: #FFC72C; padding: 12px; text-align: left; font-size: 15px; }
+td { padding: 10px; border-bottom: 1px solid #ECECEC; transition: background 0.3s ease; }
+
+tr { opacity: 0; animation: fadeRow 0.35s ease forwards; }
+@keyframes fadeRow {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+tr:nth-child(even) { background: #FFF8D6; }
+
+.btn-small { font-size: 13px; padding: 6px 10px; border-radius: 6px; }
+.btn-edit { background: #FFC72C; color: #1A1A1A; }
+
+.modal-overlay{
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: 0.3s ease;
+    z-index: 999;
+}
+.modal-overlay.active{ opacity: 1; pointer-events: auto; }
+
+.modal-box{
+    background: #fff;
+    padding: 22px;
+    width: 90%;
+    max-width: 380px;
+    border-radius: 12px;
+    text-align: center;
+    transform: translateY(-24px);
+    transition: 0.3s ease;
+}
+.modal-overlay.active .modal-box{ transform: translateY(0); }
+
+.modal-title{ font-size: 18px; font-weight: 700; margin: 0 0 8px; color: #1A1A1A; }
+.modal-text{ font-size: 14px; margin: 0 0 16px; color: #4A4A4A; }
+.modal-buttons{ display: flex; gap: 10px; }
+.modal-btn{ flex: 1; padding: 10px; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
+
+</style>
+</head>
+
+<body>
+<h1>McDonald's Rate Calculator</h1>
+<h2>Hourly Rate: ₱71.25</h2>
+
+<div class="container">
+    <div class="dashboard">
+        <div class="dash-card">
+            <div class="dash-title">Total Revenue</div>
+            <div class="dash-value" id="totalRevenue">₱0.00</div>
+        </div>
+        <div class="dash-card">
+            <div class="dash-title">Total Hours</div>
+            <div class="dash-value" id="totalHours">0</div>
+        </div>
+        <div class="dash-card">
+            <div class="dash-title">Total Entries</div>
+            <div class="dash-value" id="totalEntries">0</div>
+        </div>
+    </div>
+
+    <div class="input-card">
+        <div class="input-group">
+            <label>Hours Worked</label>
+            <input type="number" id="hours">
+            <div class="warning" id="warnHours">⚠ Please fill out this field</div>
+        </div>
+
+        <div class="input-group">
+            <label>Date</label>
+            <input type="date" id="date">
+            <div class="warning" id="warnDate">⚠ Please select a date</div>
+        </div>
+
+        <div class="input-group">
+            <label>Day Label</label>
+            <input type="text" id="day">
+            <div class="warning" id="warnDay">⚠ Please enter a day label</div>
+        </div>
+
+        <div class="input-group">
+            <label>Pay Type</label>
+            <select id="payType">
+                <option value="1">Regular (1x)</option>
+                <option value="2">Double Pay (2x)</option>
+                <option value="1.3">+30% (1.3x)</option>
+            </select>
+        </div>
+
+        <button class="btn btn-primary" onclick="addEntry()">Add Entry</button>
+    </div>
+
+    <div class="delete-container">
+        <button class="btn btn-danger" onclick="openDeleteAllModal()">Delete All Data</button>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Day</th>
+                    <th>Hours</th>
+                    <th>Pay Type</th>
+                    <th>Revenue</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="recordsTable"></tbody>
+        </table>
+    </div>
+</div>
+
+
+<!-- EDIT MODAL -->
+<div id="editModal" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-title">Edit Entry</div>
+        <div class="modal-text">Update the fields below and save changes.</div>
+
+        <div class="input-group">
+            <label>Hours Worked</label>
+            <input type="number" id="editHours">
+            <div class="warning" id="warnEditHours">⚠ Please fill out this field</div>
+        </div>
+
+        <div class="input-group">
+            <label>Date</label>
+            <input type="date" id="editDate">
+            <div class="warning" id="warnEditDate">⚠ Please select a date</div>
+        </div>
+
+        <div class="input-group">
+            <label>Day Label</label>
+            <input type="text" id="editDay">
+            <div class="warning" id="warnEditDay">⚠ Please enter a day label</div>
+        </div>
+
+        <div class="input-group" style="margin-bottom:14px;">
+            <label>Pay Type</label>
+            <select id="editPayType">
+                <option value="1">Regular (1x)</option>
+                <option value="2">Double Pay (2x)</option>
+                <option value="1.3">+30% (1.3x)</option>
+            </select>
+        </div>
+
+        <div class="modal-buttons">
+    <button class="modal-btn btn-primary" onclick="closeEditModal()">Cancel</button>
+    <button class="modal-btn btn-amber" onclick="saveEdit()">Save Changes</button>
+</div>
+    </div>
+</div>
+
+
+<!-- DELETE SINGLE ENTRY MODAL -->
+<div id="deleteEntryModal" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-title">Delete Entry?</div>
+        <div class="modal-text">Are you sure you want to delete this entry?</div>
+        <div class="modal-buttons">
+            <button class="modal-btn btn-muted" onclick="closeDeleteEntryModal()">Cancel</button>
+            <button class="modal-btn btn-danger" onclick="deleteEntryConfirmed()">Delete</button>
+        </div>
+    </div>
+</div>
+
+
+<!-- DELETE ALL MODAL -->
+<div id="deleteAllModal" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-title">Delete All Data?</div>
+        <div class="modal-text">This action cannot be undone.</div>
+        <div class="modal-buttons">
+            <button class="modal-btn btn-muted" onclick="closeDeleteAllModal()">Cancel</button>
+            <button class="modal-btn btn-danger" onclick="deleteAllConfirmed()">Delete</button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+let entries = JSON.parse(localStorage.getItem("entries")) || [];
+let editIndex = null;
+let deleteIndex = null;
+
+//
+// ✅ FIXED getInputs() — NOW WORKS PROPERLY
+//
+function getInputs(prefix) {
+    if (prefix === "") {
+        return {
+            hours: document.getElementById("hours").value.trim(),
+            date: document.getElementById("date").value.trim(),
+            day: document.getElementById("day").value.trim(),
+            payType: parseFloat(document.getElementById("payType").value)
+        };
+    }
+
+    return {
+        hours: document.getElementById(prefix + "Hours").value.trim(),
+        date: document.getElementById(prefix + "Date").value.trim(),
+        day: document.getElementById(prefix + "Day").value.trim(),
+        payType: parseFloat(document.getElementById(prefix + "PayType").value)
+    };
+}
+
+function validateInputs(data, prefix) {
+    const warnH = document.getElementById("warn" + prefix + "Hours");
+    const warnD = document.getElementById("warn" + prefix + "Date");
+    const warnDay = document.getElementById("warn" + prefix + "Day");
+
+    const okH = data.hours !== "";
+    const okD = data.date !== "";
+    const okDay = data.day !== "";
+
+    warnH.style.display = okH ? "none" : "block";
+    warnD.style.display = okD ? "none" : "block";
+    warnDay.style.display = okDay ? "none" : "block";
+
+    return okH && okD && okDay;
+}
+
+function addEntry() {
+    if (editIndex !== null) return;
+
+    const data = getInputs("");
+    if (!validateInputs(data, "")) return;
+
+    const revenue = Number(data.hours) * 71.25 * data.payType;
+
+    entries.push({
+        date: data.date,
+        day: data.day,
+        hours: data.hours,
+        payType: data.payType,
+        revenue
+    });
+
+    localStorage.setItem("entries", JSON.stringify(entries));
+
+    document.getElementById("hours").value = "";
+    document.getElementById("date").value = "";
+    document.getElementById("day").value = "";
+
+    displayEntries();
+}
+
+function displayEntries() {
+    const table = document.getElementById("recordsTable");
+    table.innerHTML = "";
+
+    entries.forEach((item, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${item.date}</td>
+            <td>${item.day}</td>
+            <td>${item.hours}</td>
+            <td>${item.payType}x</td>
+            <td>₱${item.revenue.toFixed(2)}</td>
+            <td>
+                <button class="btn-small btn-edit" onclick="openEditModal(${index})">Edit</button>
+                <button class="btn-small btn-danger" onclick="openDeleteEntryModal(${index})">Delete</button>
+            </td>
+        `;
+        table.appendChild(row);
+    });
+
+    updateTotals();
+}
+
+function updateTotals() {
+    const totalHours = entries.reduce((s, e) => s + Number(e.hours), 0);
+    const totalRevenue = entries.reduce((s, e) => s + Number(e.revenue), 0);
+
+    document.getElementById("totalHours").innerText = totalHours;
+    document.getElementById("totalRevenue").innerText = "₱" + totalRevenue.toFixed(2);
+    document.getElementById("totalEntries").innerText = entries.length;
+}
+
+function openEditModal(index) {
+    editIndex = index;
+    const e = entries[index];
+
+    document.getElementById("editHours").value = e.hours;
+    document.getElementById("editDate").value = e.date;
+    document.getElementById("editDay").value = e.day;
+    document.getElementById("editPayType").value = e.payType;
+
+    openModal("editModal");
+}
+
+function closeEditModal() {
+    editIndex = null;
+    closeModal("editModal");
+}
+
+function saveEdit() {
+    if (editIndex === null) return;
+
+    const data = getInputs("edit");
+    if (!validateInputs(data, "Edit")) return;
+
+    const revenue = Number(data.hours) * 71.25 * data.payType;
+
+    entries[editIndex] = {
+        date: data.date,
+        day: data.day,
+        hours: data.hours,
+        payType: data.payType,
+        revenue
+    };
+
+    localStorage.setItem("entries", JSON.stringify(entries));
+
+    closeEditModal();
+    displayEntries();
+}
+
+function openDeleteEntryModal(i) {
+    deleteIndex = i;
+    openModal("deleteEntryModal");
+}
+function closeDeleteEntryModal() {
+    deleteIndex = null;
+    closeModal("deleteEntryModal");
+}
+function deleteEntryConfirmed() {
+    if (deleteIndex !== null) {
+        entries.splice(deleteIndex, 1);
+        localStorage.setItem("entries", JSON.stringify(entries));
+    }
+    deleteIndex = null;
+    closeDeleteEntryModal();
+    displayEntries();
+}
+
+function openDeleteAllModal() { openModal("deleteAllModal"); }
+function closeDeleteAllModal() { closeModal("deleteAllModal"); }
+function deleteAllConfirmed() {
+    entries = [];
+    localStorage.removeItem("entries");
+    closeDeleteAllModal();
+    displayEntries();
+}
+
+function openModal(id) {
+    document.getElementById(id).classList.add("active");
+    document.body.style.overflow = "hidden";
+}
+function closeModal(id) {
+    document.getElementById(id).classList.remove("active");
+    document.body.style.overflow = "auto";
+}
+
+window.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    if (document.getElementById("editModal").classList.contains("active")) closeEditModal();
+    if (document.getElementById("deleteEntryModal").classList.contains("active")) closeDeleteEntryModal();
+    if (document.getElementById("deleteAllModal").classList.contains("active")) closeDeleteAllModal();
+});
+
+displayEntries();
+</script>
+
+</body>
+          </html>
